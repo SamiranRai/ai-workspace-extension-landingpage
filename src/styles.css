@@ -547,6 +547,66 @@ details p {
 .on-dark .btn.ghost:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+.waitlist-form {
+  max-width: 620px;
+  margin: 36px auto 0;
+  text-align: left;
+}
+.waitlist-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a1a1a6;
+  margin-bottom: 8px;
+}
+.waitlist-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+}
+.waitlist-fields {
+  display: flex;
+  gap: 10px;
+}
+.waitlist-fields input {
+  min-width: 0;
+  flex: 1;
+  height: 48px;
+  border: 1px solid #424245;
+  border-radius: 980px;
+  padding: 0 18px;
+  color: #f5f5f7;
+  background: #1c1c1e;
+  font: inherit;
+}
+.waitlist-fields input:focus {
+  outline: 3px solid rgba(0, 113, 227, 0.5);
+  outline-offset: 2px;
+}
+.waitlist-fields .btn {
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.waitlist-fields .btn:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+.waitlist-note,
+.form-status {
+  font-size: 13px;
+  margin-top: 10px;
+}
+.waitlist-note {
+  color: #a1a1a6;
+}
+.form-status.success {
+  color: #7ee2a8;
+}
+.form-status.error {
+  color: #ff9a9a;
+}
 .foot {
   background: var(--alt);
   font-size: 12px;
@@ -579,6 +639,14 @@ details p {
   }
   .card {
     min-height: 0;
+  }
+}
+@media (max-width: 560px) {
+  .waitlist-fields {
+    flex-direction: column;
+  }
+  .waitlist-fields .btn {
+    justify-content: center;
   }
 }
 @media (prefers-color-scheme: dark) {

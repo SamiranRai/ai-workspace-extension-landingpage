@@ -1,5 +1,6 @@
 import { CONFIG, FEATURES, AUDIENCE, FAQ } from "./content.js";
 import { IMG } from "./images.js";
+import { useState } from "react";
 
 const NAMES = CONFIG.platforms.map((p) => p.name);
 const NAME_LIST = new Intl.ListFormat("en", {
@@ -26,13 +27,96 @@ function Shot({ img, alt, sizes, priority = false }) {
 function Actions({ onDark = false }) {
   return (
     <div className={`cta-row${onDark ? " on-dark" : ""}`}>
-      <a className="btn" href={CONFIG.ctaUrl}>
-        Add to Chrome
+      <a className="btn" href="#waitlist">
+        Join the waitlist · Chrome
       </a>
-      <a className="btn ghost" href={CONFIG.dealUrl}>
-        Get lifetime access
+      <a className="btn ghost" href="#waitlist">
+        Join the waitlist · Lifetime access
       </a>
     </div>
+  );
+}
+
+function WaitlistForm() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState({ type: "idle", message: "" });
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setStatus({ type: "loading", message: "" });
+
+    try {
+      const response = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          website: event.currentTarget.elements.website.value,
+        }),
+      });
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          "The waitlist service is unavailable. Please try again after deployment.",
+        );
+      }
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "We couldn't join you to the waitlist.");
+      }
+
+      setEmail("");
+      setStatus({
+        type: "success",
+        message: "You're on the list. We'll email you when it's ready.",
+      });
+    } catch (error) {
+      setStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    }
+  }
+
+  return (
+    <form className="waitlist-form" onSubmit={handleSubmit}>
+      <label htmlFor="waitlist-email">Your email address</label>
+      <input
+        className="waitlist-trap"
+        name="website"
+        type="text"
+        tabIndex="-1"
+        autoComplete="off"
+        aria-hidden="true"
+      />
+      <div className="waitlist-fields">
+        <input
+          id="waitlist-email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+        <button className="btn" type="submit" disabled={status.type === "loading"}>
+          {status.type === "loading" ? "Joining..." : "Join the waitlist"}
+        </button>
+      </div>
+      <p className="waitlist-note">
+        One email. No spam. Unsubscribe anytime.
+      </p>
+      {status.message && (
+        <p className={`form-status ${status.type}`} role="status">
+          {status.message}
+        </p>
+      )}
+    </form>
   );
 }
 
@@ -50,8 +134,8 @@ function Nav() {
           <a href="#who">Who it’s for</a>
           <a href="#faq">FAQ</a>
         </nav>
-        <a className="btn btn-sm" href={CONFIG.ctaUrl}>
-          Add to Chrome
+        <a className="btn btn-sm" href="#waitlist">
+          Join the waitlist
         </a>
       </div>
     </header>
@@ -241,12 +325,15 @@ function Faq() {
 
 function FinalCta() {
   return (
-    <section className="sec">
+    <section className="sec" id="waitlist">
       <div className="wrap">
         <div className="cta-panel">
-          <h2>Try it on your own chat history.</h2>
-          <p className="lede">Beta, with lifetime pricing on AppSumo.</p>
-          <Actions onDark />
+          <h2>Be first to try AI Workspace.</h2>
+          <p className="lede">
+            Join the waitlist for Chrome access and lifetime pricing when we
+            launch.
+          </p>
+          <WaitlistForm />
         </div>
       </div>
     </section>

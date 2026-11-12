@@ -17,3 +17,24 @@ Live demo: put your embed inside `<div class="frame" id="demo">` in `src/App.jsx
 4. Deploy, then add your custom domain under **Settings > Domains**.
 
 `vercel.json` configures the build output and security/cache headers.
+
+## Waitlist
+
+The CTAs open the waitlist form at the bottom of the page. The form submits to
+the Vercel Function at `/api/waitlist`, which adds the address to a Resend
+Audience. Vercel itself hosts the function but does not provide permanent
+storage, so this external list is intentional.
+
+Before deploying, create a Resend API key and Audience, then add these Vercel
+environment variables for Production (and Preview if needed):
+
+- `RESEND_API_KEY`
+- `RESEND_AUDIENCE_ID`
+
+The function validates and normalizes the email, quietly handles duplicate
+submissions, and returns a clear error if the integration is not configured.
+Only the email address is collected; no other form data is sent.
+
+The standard Vite dev server does not run Vercel Functions, so test the
+waitlist on a Vercel Preview deployment (or with the Vercel CLI) rather than
+`npm run dev` alone.
